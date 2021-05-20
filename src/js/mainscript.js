@@ -26,6 +26,7 @@ function findReps(input) {
   fetch(searchUrl).then( res => res.json())
                   .then( res => {
                     clearSearch();
+                    if (res && res.items) {
                     res.items.forEach((item) => {
                       let card = addRecommend(item);
                       let objectForAdding = {
@@ -39,6 +40,7 @@ function findReps(input) {
                         clearSearch();
                       };
                     });
+                  };
                   });
 }
 
