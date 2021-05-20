@@ -21,11 +21,23 @@ function clearSearch() {
 }
 
 function findReps(input) {
+  if (input.trim() == '') return;
   let searchUrl = 'https://api.github.com/search/repositories?q='+ input +'+in:name&per_page=5';
   fetch(searchUrl).then( res => res.json())
                   .then( res => {
+                    clearSearch();
                     res.items.forEach((item) => {
-                      addRecommend(item);
+                      let card = addRecommend(item);
+                      let objectForAdding = {
+                        name: item.name,
+                        owner: item.owner.login,
+                        stars: item.stargazers_count
+                      };
+                      card.onclick = () => {
+                        addResult(objectForAdding);
+                        searchField.value = '';
+                        clearSearch();
+                      };
                     });
                   });
 }
@@ -36,10 +48,8 @@ function addRecommend(responseObj) {
   let recommendedCard = document.createElement('div');
   recommendedCard.classList.add('search__recommend');
   recommendedCard.textContent = responseObj.name;
-  recommendedCard.setAttribute('objName', responseObj.name);
-  recommendedCard.setAttribute('owner', responseObj.owner.login);
-  recommendedCard.setAttribute('stars', responseObj.stargazers_count);
   searchlist.append(recommendedCard);
+  return recommendedCard;
 }
 
 function addResult(responseObj) {
@@ -65,13 +75,4 @@ results.addEventListener('click', (e) => {
 searchField.addEventListener('input', (e) => {
   clearSearch();
   finderDebounced(searchField.value);
-});
-
-searchlist.addEventListener('click', (e) => {
-  if (e.target.classList.contains('search__recommend')) {
-    addResult({ name: e.target.getAttribute('objName'), owner: e.target.getAttribute('owner'), stars: e.target.getAttribute('stars')});
-    searchField.value = '';
-    clearSearch();
-  };
-  return;
-});
+})
