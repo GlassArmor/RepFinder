@@ -2,6 +2,8 @@
 const searchlist = document.querySelector('.search__results');
 const searchField = document.querySelector('.search__field');
 const results = document.querySelector('.results');
+let resultsChecker = 0;
+let listenerAdd;
 
 const debounce = (fn, debounceTime) => {
     let delay;
@@ -16,6 +18,7 @@ const debounce = (fn, debounceTime) => {
 
 function clearSearch() {
   searchlist.querySelectorAll('.search__recommend').forEach((item) => {
+    item.removeEventListener('click', listenerAdd);
     item.remove();
   });
 }
@@ -34,11 +37,12 @@ function findReps(input) {
                         owner: item.owner.login,
                         stars: item.stargazers_count
                       };
-                      card.onclick = () => {
+                      let listenerAdd = () => {
                         addResult(objectForAdding);
                         searchField.value = '';
                         clearSearch();
                       };
+                      card.addEventListener('click', listenerAdd);
                     });
                   };
                   });
@@ -57,22 +61,30 @@ function addRecommend(responseObj) {
 function addResult(responseObj) {
   let resultCard = `
         <div class="results__card">
-          <ul class="results__list">
-            <li class="results__info">Name: ${responseObj.name}</li>
-            <li class="results__info">Owner: ${responseObj.owner}</li>
-            <li class="results__info">Stars: ${responseObj.stars}</li>
-          </ul>
+          <div class="results__list">
+            <div class="results__info">Name: ${responseObj.name}</div>
+            <div class="results__info">Owner: ${responseObj.owner}</div>
+            <div class="results__info">Stars: ${responseObj.stars}</div>
+          </div>
           <button class="results__close">REMOVE</button>
         </div>`;
   results.insertAdjacentHTML('beforeend', resultCard);
+  if (resultsChecker == 0) {
+    results.addEventListener('click', closer );
+  };
+  resultsChecker += 1;
 }
 
-results.addEventListener('click', (e) => {
+const closer = (e) => {
   if (e.target.classList.contains('results__close')) {
     e.target.parentElement.remove();
+    resultsChecker -= 1;
+    if (resultsChecker == 0) {
+      results.removeEventListener('click', closer );
+    }
   };
   return;
-});
+}
 
 searchField.addEventListener('input', (e) => {
   clearSearch();

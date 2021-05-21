@@ -41,9 +41,7 @@
   align-content: center;
   border: 2px solid rgb(0, 215, 34);
 }
-.results__list {
-  list-style: none;
-}
+
 .results__close {
   margin: auto 15px;
   padding: 5px;
